@@ -1,1 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/springboot
+    username: postgres
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  thymeleaf:
+    cache: false
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+  main:
+    allow-bean-definition-overriding: true
 
