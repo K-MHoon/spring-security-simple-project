@@ -1,11 +1,13 @@
 package com.example.springsecuritysimpleproject.security.config;
 
+import com.example.springsecuritysimpleproject.security.common.FormAuthenticationDetailsSource;
 import com.example.springsecuritysimpleproject.security.provider.CustomAuthenticationProvider;
 import com.example.springsecuritysimpleproject.security.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -21,6 +23,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
+    private final AuthenticationDetailsSource detailsSource;
 
     /**
      * 정적 파일에 대한 보안 필터를 해제한다.
@@ -45,6 +48,7 @@ public class SecurityConfig {
                 .and()
                 .formLogin()
                 .loginPage("/login")
+                .authenticationDetailsSource(detailsSource)
                 .defaultSuccessUrl("/")
                 .loginProcessingUrl("/login_proc")
                 .permitAll();
