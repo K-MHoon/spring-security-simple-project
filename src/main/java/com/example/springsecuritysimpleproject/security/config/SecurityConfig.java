@@ -25,6 +25,7 @@ public class SecurityConfig {
     /**
      * 정적 파일에 대한 보안 필터를 해제한다.
      * 보안 필터를 아예 거치지 않는다. (permitAll과의 차이)
+     *
      * @return
      */
     @Bean
@@ -39,16 +40,21 @@ public class SecurityConfig {
                 .antMatchers("/", "/users", "user/login/**").permitAll()
                 .antMatchers("/mypage").hasRole("USER")
                 .antMatchers("/messages").hasAnyRole("MANAGER", "USER")
-                .antMatchers("/config").hasAnyRole("ADMIN","USER","MANAGER")
+                .antMatchers("/config").hasAnyRole("ADMIN", "USER", "MANAGER")
                 .anyRequest().authenticated()
                 .and()
-                .formLogin();
+                .formLogin()
+                .loginPage("/login")
+                .defaultSuccessUrl("/")
+                .loginProcessingUrl("/login_proc")
+                .permitAll();
 
         return http.build();
     }
 
     /**
      * 인 메모리 계정을 생성한다.
+     *
      * @return
      */
 //    @Bean
@@ -73,7 +79,6 @@ public class SecurityConfig {
 //                .build();
 //        return new InMemoryUserDetailsManager(user, manager, admin);
 //    }
-
     @Bean
     public AuthenticationProvider provider() {
         return new CustomAuthenticationProvider(userDetailsService, passwordEncoder());
