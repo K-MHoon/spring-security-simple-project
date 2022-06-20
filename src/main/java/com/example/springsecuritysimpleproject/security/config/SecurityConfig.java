@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
@@ -26,6 +27,7 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final AuthenticationDetailsSource detailsSource;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
+    private final AuthenticationFailureHandler authenticationFailureHandler;
 
     /**
      * 정적 파일에 대한 보안 필터를 해제한다.
@@ -42,7 +44,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/", "/users", "user/login/**").permitAll()
+                .antMatchers("/", "/users", "user/login/**", "/login*").permitAll()
                 .antMatchers("/mypage").hasRole("USER")
                 .antMatchers("/messages").hasAnyRole("MANAGER", "USER")
                 .antMatchers("/config").hasAnyRole("ADMIN", "USER", "MANAGER")
@@ -53,6 +55,7 @@ public class SecurityConfig {
                 .authenticationDetailsSource(detailsSource)
                 .defaultSuccessUrl("/")
                 .successHandler(authenticationSuccessHandler)
+                .failureHandler(authenticationFailureHandler)
                 .loginProcessingUrl("/login_proc")
                 .permitAll();
 
