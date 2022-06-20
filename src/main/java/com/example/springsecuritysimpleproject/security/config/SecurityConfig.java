@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -24,6 +25,7 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final AuthenticationDetailsSource detailsSource;
+    private final AuthenticationSuccessHandler authenticationSuccessHandler;
 
     /**
      * 정적 파일에 대한 보안 필터를 해제한다.
@@ -50,6 +52,7 @@ public class SecurityConfig {
                 .loginPage("/login")
                 .authenticationDetailsSource(detailsSource)
                 .defaultSuccessUrl("/")
+                .successHandler(authenticationSuccessHandler)
                 .loginProcessingUrl("/login_proc")
                 .permitAll();
 
