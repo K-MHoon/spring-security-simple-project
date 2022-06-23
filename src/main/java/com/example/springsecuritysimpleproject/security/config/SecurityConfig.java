@@ -2,6 +2,7 @@ package com.example.springsecuritysimpleproject.security.config;
 
 import com.example.springsecuritysimpleproject.security.handler.CustomAccessDeniedHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,13 +20,20 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 @Order(1)
 public class SecurityConfig {
 
     private final AuthenticationDetailsSource detailsSource;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
     private final AuthenticationFailureHandler authenticationFailureHandler;
+
+    public SecurityConfig(AuthenticationDetailsSource detailsSource,
+                          @Qualifier("customAuthenticationSuccessHandler") AuthenticationSuccessHandler authenticationSuccessHandler,
+                          @Qualifier("customAuthenticationFailureHandler") AuthenticationFailureHandler authenticationFailureHandler) {
+        this.detailsSource = detailsSource;
+        this.authenticationSuccessHandler = authenticationSuccessHandler;
+        this.authenticationFailureHandler = authenticationFailureHandler;
+    }
 
     /**
      * 정적 파일에 대한 보안 필터를 해제한다.

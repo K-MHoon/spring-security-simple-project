@@ -15,8 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Objects;
 
-@Component
-public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessHandler {
+@Component("customAuthenticationSuccessHandler")
+public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     // 사용자의 요청 정보를 담고 있음
     private RequestCache requestCache = new HttpSessionRequestCache();
