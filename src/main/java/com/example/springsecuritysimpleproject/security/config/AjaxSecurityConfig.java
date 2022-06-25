@@ -28,7 +28,7 @@ public class AjaxSecurityConfig {
     @Bean
     public SecurityFilterChain AjaxSecurityFilterChain(HttpSecurity http) throws Exception {
 
-        http.addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
+        http
                 .antMatcher("/api/**")
                 .authorizeRequests()
                 .antMatchers("/api/messages").hasRole("MANAGER")
@@ -38,7 +38,18 @@ public class AjaxSecurityConfig {
                 .authenticationEntryPoint(new AjaxLoginAuthenticationEntryPoint())
                 .accessDeniedHandler(ajaxAccessDeniedHandler());
 
+        customConfigureAjax(http);
+
         return http.build();
+    }
+
+    private void customConfigureAjax(HttpSecurity http) throws Exception {
+        http
+                .apply(new AjaxLoginConfigurer<>())
+                .successHandlerAjax(ajaxAuthenticationSuccessHandler())
+                .failureHandlerAjax(ajaxAuthenticationFailureHandler())
+                .setAuthenticationManager(authenticationManager)
+                .loginProcessingUrl("/api/login");
     }
 
     @Bean
@@ -46,7 +57,11 @@ public class AjaxSecurityConfig {
         return new AjaxAccessDeniedHandler();
     }
 
-    @Bean
+    /**
+     * DSL로 대체되어 사용되지 않는다.
+     * @return
+     */
+//    @Bean
     public AjaxLoginProcessingFilter ajaxLoginProcessingFilter() {
         AjaxLoginProcessingFilter ajaxLoginProcessingFilter = new AjaxLoginProcessingFilter();
         ajaxLoginProcessingFilter.setAuthenticationManager(authenticationManager);

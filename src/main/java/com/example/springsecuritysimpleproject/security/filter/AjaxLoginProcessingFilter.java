@@ -4,6 +4,7 @@ import com.example.springsecuritysimpleproject.dto.account.AccountDto;
 import com.example.springsecuritysimpleproject.security.token.AjaxAuthenticationToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -25,7 +26,7 @@ public class AjaxLoginProcessingFilter extends AbstractAuthenticationProcessingF
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
 
-        if(!isAjax(request)) {
+        if(!HttpMethod.POST.name().equals(request.getMethod()) || !isAjax(request)) {
             throw new IllegalStateException("Authentication is not supported");
         }
 
