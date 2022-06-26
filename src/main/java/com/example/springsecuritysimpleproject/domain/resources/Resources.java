@@ -29,7 +29,7 @@ public class Resources implements Serializable {
 
     private String httpMethod;
 
-    private int orderNum;
+    private Integer orderNum;
 
     private String resourceType;
 
