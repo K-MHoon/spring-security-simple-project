@@ -1,6 +1,7 @@
 package com.example.springsecuritysimpleproject.service.user;
 
 import com.example.springsecuritysimpleproject.domain.resources.Resources;
+import com.example.springsecuritysimpleproject.dto.resources.ResourcesDto;
 
 import java.util.List;
 
@@ -10,7 +11,11 @@ public interface ResourcesService {
 
     List<Resources> getResources();
 
-    void createResources(Resources resources);
+    void createResources(ResourcesDto resourcesDto);
 
     void deleteResources(Long id);
+
+    ResourcesDto getResourcesDtoById(Long id);
+
+    ResourcesDto getCleanRoleResourcesDto();
 }

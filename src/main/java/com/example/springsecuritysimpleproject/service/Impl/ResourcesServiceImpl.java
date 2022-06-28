@@ -1,15 +1,22 @@
 package com.example.springsecuritysimpleproject.service.Impl;
 
 import com.example.springsecuritysimpleproject.domain.resources.Resources;
+import com.example.springsecuritysimpleproject.domain.role.Role;
+import com.example.springsecuritysimpleproject.dto.resources.ResourcesDto;
 import com.example.springsecuritysimpleproject.repository.resources.ResourcesRepository;
+import com.example.springsecuritysimpleproject.repository.role.RoleRepository;
 import com.example.springsecuritysimpleproject.service.user.ResourcesService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -18,6 +25,8 @@ import java.util.List;
 public class ResourcesServiceImpl implements ResourcesService {
 
     private final ResourcesRepository resourcesRepository;
+    private final ModelMapper modelMapper;
+    private final RoleRepository roleRepository;
 
     @Override
     public Resources getResources(Long id) {
@@ -30,8 +39,28 @@ public class ResourcesServiceImpl implements ResourcesService {
     }
 
     @Override
-    public void createResources(Resources resources) {
+    public void createResources(ResourcesDto resourcesDto) {
+        Role role = roleRepository.findByRoleName(resourcesDto.getRoleName())
+                .orElseThrow(() -> new EntityNotFoundException("Role Entity가 존재하지 않습니다."));
+
+        Set<Role> roles = new HashSet<>();
+        roles.add(role);
+        Resources resources = modelMapper.map(resourcesDto, Resources.class);
+        resources.setRoleSet(roles);
+
         resourcesRepository.save(resources);
+    }
+
+    @Override
+    public ResourcesDto getResourcesDtoById(Long id) {
+        return modelMapper.map(getResources(id), ResourcesDto.class);
+    }
+
+    @Override
+    public ResourcesDto getCleanRoleResourcesDto() {
+        return ResourcesDto.builder()
+                .roleSet(Set.of(new Role()))
+                .build();
     }
 
     @Override
