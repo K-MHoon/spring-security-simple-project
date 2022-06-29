@@ -1,22 +1,38 @@
 package com.example.springsecuritysimpleproject.security.config;
 
 import com.example.springsecuritysimpleproject.security.handler.CustomAccessDeniedHandler;
+import com.example.springsecuritysimpleproject.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
+import com.example.springsecuritysimpleproject.security.provider.AjaxAuthenticationProvider;
+import com.example.springsecuritysimpleproject.security.provider.CustomAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.access.AccessDecisionManager;
+import org.springframework.security.access.AccessDecisionVoter;
+import org.springframework.security.access.vote.AffirmativeBased;
+import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -26,13 +42,16 @@ public class SecurityConfig {
     private final AuthenticationDetailsSource detailsSource;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
     private final AuthenticationFailureHandler authenticationFailureHandler;
+    private final UserDetailsService userDetailsService;
 
     public SecurityConfig(AuthenticationDetailsSource detailsSource,
                           @Qualifier("customAuthenticationSuccessHandler") AuthenticationSuccessHandler authenticationSuccessHandler,
-                          @Qualifier("customAuthenticationFailureHandler") AuthenticationFailureHandler authenticationFailureHandler) {
+                          @Qualifier("customAuthenticationFailureHandler") AuthenticationFailureHandler authenticationFailureHandler,
+                          UserDetailsService userDetailsService) {
         this.detailsSource = detailsSource;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.authenticationFailureHandler = authenticationFailureHandler;
+        this.userDetailsService = userDetailsService;
     }
 
     /**
@@ -71,6 +90,7 @@ public class SecurityConfig {
                 .permitAll();
         http.exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler());
+        http.addFilterBefore(customFilterSecurityInterceptor(), FilterSecurityInterceptor.class);
 
         return http.build();
     }
@@ -80,6 +100,45 @@ public class SecurityConfig {
         CustomAccessDeniedHandler accessDeniedHandler = new CustomAccessDeniedHandler();
         accessDeniedHandler.setErrorPage("/denied");
         return accessDeniedHandler;
+    }
+
+    @Bean
+    public AuthenticationProvider ajaxAuthenticationProvider() {
+        return new AjaxAuthenticationProvider(userDetailsService, passwordEncoder());
+    }
+
+    @Bean
+    public AuthenticationProvider customAuthenticationProvider() {
+        return new CustomAuthenticationProvider(userDetailsService, passwordEncoder());
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        return new ProviderManager(Arrays.asList(customAuthenticationProvider(),
+                ajaxAuthenticationProvider()));
+    }
+
+    @Bean
+    public FilterSecurityInterceptor customFilterSecurityInterceptor() {
+        FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
+        filterSecurityInterceptor.setSecurityMetadataSource(urlFilterInvocationSecurityMetadataSource());
+        filterSecurityInterceptor.setAccessDecisionManager(affirmativeBased());
+        filterSecurityInterceptor.setAuthenticationManager(authenticationManager());
+        return filterSecurityInterceptor;
+    }
+
+    private AccessDecisionManager affirmativeBased() {
+        AffirmativeBased affirmativeBased = new AffirmativeBased(getAccessDecisionVoters());
+        return affirmativeBased;
+    }
+
+    private List<AccessDecisionVoter<?>> getAccessDecisionVoters() {
+        return Arrays.asList(new RoleVoter());
+    }
+
+    @Bean
+    public FilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource() {
+        return new UrlFilterInvocationSecurityMetadataSource();
     }
 
     /**
