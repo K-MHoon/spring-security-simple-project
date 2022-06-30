@@ -1,10 +1,11 @@
 package com.example.springsecuritysimpleproject.security.config;
 
+import com.example.springsecuritysimpleproject.security.factory.UrlResourcesMapFactoryBean;
 import com.example.springsecuritysimpleproject.security.handler.CustomAccessDeniedHandler;
 import com.example.springsecuritysimpleproject.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
 import com.example.springsecuritysimpleproject.security.provider.AjaxAuthenticationProvider;
 import com.example.springsecuritysimpleproject.security.provider.CustomAuthenticationProvider;
-import lombok.RequiredArgsConstructor;
+import com.example.springsecuritysimpleproject.service.resource.SecurityResourceService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -43,15 +44,17 @@ public class SecurityConfig {
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
     private final AuthenticationFailureHandler authenticationFailureHandler;
     private final UserDetailsService userDetailsService;
+    private final SecurityResourceService securityResourceService;
 
     public SecurityConfig(AuthenticationDetailsSource detailsSource,
                           @Qualifier("customAuthenticationSuccessHandler") AuthenticationSuccessHandler authenticationSuccessHandler,
                           @Qualifier("customAuthenticationFailureHandler") AuthenticationFailureHandler authenticationFailureHandler,
-                          UserDetailsService userDetailsService) {
+                          UserDetailsService userDetailsService, SecurityResourceService securityResourceService) {
         this.detailsSource = detailsSource;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.userDetailsService = userDetailsService;
+        this.securityResourceService = securityResourceService;
     }
 
     /**
@@ -119,7 +122,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public FilterSecurityInterceptor customFilterSecurityInterceptor() {
+    public FilterSecurityInterceptor customFilterSecurityInterceptor() throws Exception {
         FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
         filterSecurityInterceptor.setSecurityMetadataSource(urlFilterInvocationSecurityMetadataSource());
         filterSecurityInterceptor.setAccessDecisionManager(affirmativeBased());
@@ -137,8 +140,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    public FilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource() {
-        return new UrlFilterInvocationSecurityMetadataSource();
+    public FilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource() throws Exception {
+        return new UrlFilterInvocationSecurityMetadataSource(urlResourcesMapFactoryBean().getObject());
+    }
+
+    private UrlResourcesMapFactoryBean urlResourcesMapFactoryBean() {
+        UrlResourcesMapFactoryBean urlResourcesMapFactoryBean = new UrlResourcesMapFactoryBean();
+        urlResourcesMapFactoryBean.setSecurityResourceService(securityResourceService);
+        return urlResourcesMapFactoryBean;
     }
 
     /**

@@ -34,7 +34,7 @@ public class AjaxSecurityConfig {
                 .antMatchers("/api/messages").hasRole("MANAGER")
                 .antMatchers("/api/login").permitAll()
                 .anyRequest().authenticated();
-//        http.csrf().disable();
+        http.csrf().disable();
         http.exceptionHandling()
                 .authenticationEntryPoint(new AjaxLoginAuthenticationEntryPoint())
                 .accessDeniedHandler(ajaxAccessDeniedHandler());
