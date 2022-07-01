@@ -105,10 +105,10 @@ public class SecurityConfig {
         return accessDeniedHandler;
     }
 
-    @Bean
-    public AuthenticationProvider ajaxAuthenticationProvider() {
-        return new AjaxAuthenticationProvider(userDetailsService, passwordEncoder());
-    }
+//    @Bean
+//    public AuthenticationProvider ajaxAuthenticationProvider() {
+//        return new AjaxAuthenticationProvider(userDetailsService, passwordEncoder());
+//    }
 
     @Bean
     public AuthenticationProvider customAuthenticationProvider() {
@@ -117,8 +117,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager() {
-        return new ProviderManager(Arrays.asList(customAuthenticationProvider(),
-                ajaxAuthenticationProvider()));
+        return new ProviderManager(Arrays.asList(customAuthenticationProvider()));
     }
 
     @Bean
@@ -141,7 +140,7 @@ public class SecurityConfig {
 
     @Bean
     public FilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource() throws Exception {
-        return new UrlFilterInvocationSecurityMetadataSource(urlResourcesMapFactoryBean().getObject());
+        return new UrlFilterInvocationSecurityMetadataSource(urlResourcesMapFactoryBean().getObject(), securityResourceService);
     }
 
     private UrlResourcesMapFactoryBean urlResourcesMapFactoryBean() {

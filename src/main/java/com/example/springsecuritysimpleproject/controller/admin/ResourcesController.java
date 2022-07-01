@@ -1,6 +1,7 @@
 package com.example.springsecuritysimpleproject.controller.admin;
 
 import com.example.springsecuritysimpleproject.dto.resources.ResourcesDto;
+import com.example.springsecuritysimpleproject.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
 import com.example.springsecuritysimpleproject.service.user.ResourcesService;
 import com.example.springsecuritysimpleproject.service.user.RoleService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ public class ResourcesController {
 
     private final ResourcesService resourcesService;
     private final RoleService roleService;
+    private final UrlFilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource;
 
     @GetMapping
     public String getResources(Model model) {
@@ -26,7 +28,7 @@ public class ResourcesController {
     @PostMapping
     public String createResources(ResourcesDto resourcesDto) {
         resourcesService.createResources(resourcesDto);
-
+        filterInvocationSecurityMetadataSource.reload();
         return "redirect:/admin/resources";
     }
 
@@ -35,7 +37,7 @@ public class ResourcesController {
         model.addAttribute("roleList", roleService.getRoles());
         model.addAttribute("resources", resourcesService.getResourcesDtoById(id));
 
-        return "admin/resources/detail";
+        return "admin/resource/detail";
     }
 
     @GetMapping("/register")
@@ -49,7 +51,7 @@ public class ResourcesController {
     @DeleteMapping("/delete/{id}")
     public String removeResources(@PathVariable Long id, Model model) {
         resourcesService.deleteResources(id);
-
+        filterInvocationSecurityMetadataSource.reload();
         return "redirect:/admin/resources";
     }
 }
