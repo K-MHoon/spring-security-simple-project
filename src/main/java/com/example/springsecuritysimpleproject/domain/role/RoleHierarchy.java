@@ -21,6 +21,7 @@ public class RoleHierarchy implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "child_name")
     private String childName;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
