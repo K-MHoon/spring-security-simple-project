@@ -1,6 +1,7 @@
 package com.example.springsecuritysimpleproject.security.config;
 
 import com.example.springsecuritysimpleproject.security.factory.UrlResourcesMapFactoryBean;
+import com.example.springsecuritysimpleproject.security.filter.PermitAllFilter;
 import com.example.springsecuritysimpleproject.security.handler.CustomAccessDeniedHandler;
 import com.example.springsecuritysimpleproject.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
 import com.example.springsecuritysimpleproject.security.provider.AjaxAuthenticationProvider;
@@ -45,6 +46,8 @@ public class SecurityConfig {
     private final AuthenticationFailureHandler authenticationFailureHandler;
     private final UserDetailsService userDetailsService;
     private final SecurityResourceService securityResourceService;
+
+    private String[] permitAllResources = {"/", "user/login/**", "/login"};
 
     public SecurityConfig(AuthenticationDetailsSource detailsSource,
                           @Qualifier("customAuthenticationSuccessHandler") AuthenticationSuccessHandler authenticationSuccessHandler,
@@ -121,12 +124,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public FilterSecurityInterceptor customFilterSecurityInterceptor() throws Exception {
-        FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
-        filterSecurityInterceptor.setSecurityMetadataSource(urlFilterInvocationSecurityMetadataSource());
-        filterSecurityInterceptor.setAccessDecisionManager(affirmativeBased());
-        filterSecurityInterceptor.setAuthenticationManager(authenticationManager());
-        return filterSecurityInterceptor;
+    public PermitAllFilter customFilterSecurityInterceptor() throws Exception {
+        PermitAllFilter permitAllFilter = new PermitAllFilter(permitAllResources);
+        permitAllFilter.setSecurityMetadataSource(urlFilterInvocationSecurityMetadataSource());
+        permitAllFilter.setAccessDecisionManager(affirmativeBased());
+        permitAllFilter.setAuthenticationManager(authenticationManager());
+        return permitAllFilter;
     }
 
     private AccessDecisionManager affirmativeBased() {
