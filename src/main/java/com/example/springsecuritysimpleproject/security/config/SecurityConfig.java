@@ -5,6 +5,7 @@ import com.example.springsecuritysimpleproject.security.filter.PermitAllFilter;
 import com.example.springsecuritysimpleproject.security.handler.CustomAccessDeniedHandler;
 import com.example.springsecuritysimpleproject.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
 import com.example.springsecuritysimpleproject.security.provider.CustomAuthenticationProvider;
+import com.example.springsecuritysimpleproject.security.voter.IpAddressVoter;
 import com.example.springsecuritysimpleproject.service.resource.SecurityResourceService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -141,6 +142,7 @@ public class SecurityConfig {
     private List<AccessDecisionVoter<?>> getAccessDecisionVoters() {
 
         List<AccessDecisionVoter<? extends Object>> accessDecisionVoters = new ArrayList<>();
+        accessDecisionVoters.add(new IpAddressVoter(securityResourceService));
         accessDecisionVoters.add(roleVoter());
 
         return accessDecisionVoters;
