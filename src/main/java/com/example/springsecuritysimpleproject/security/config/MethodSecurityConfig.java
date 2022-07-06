@@ -19,7 +19,7 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
     @Override
     protected MethodSecurityMetadataSource customMethodSecurityMetadataSource() {
-        return new MapBasedMethodSecurityMetadataSource();
+        return mapBasedMethodSecurityMetadataSource();
     }
 
     @Bean
