@@ -31,40 +31,28 @@ public class ProtectPointcutPostProcessor implements BeanPostProcessor {
         Assert.notNull(mapBasedMethodSecurityMetadataSource,
                 "MapBasedMethodSecurityMetadataSource to populate is required");
         this.mapBasedMethodSecurityMetadataSource = mapBasedMethodSecurityMetadataSource;
-        // Set up AspectJ pointcut expression parser
+
         Set<PointcutPrimitive> supportedPrimitives = new HashSet<>(3);
         supportedPrimitives.add(PointcutPrimitive.EXECUTION);
         supportedPrimitives.add(PointcutPrimitive.ARGS);
         supportedPrimitives.add(PointcutPrimitive.REFERENCE);
-        // supportedPrimitives.add(PointcutPrimitive.THIS);
-        // supportedPrimitives.add(PointcutPrimitive.TARGET);
-        // supportedPrimitives.add(PointcutPrimitive.WITHIN);
-        // supportedPrimitives.add(PointcutPrimitive.AT_ANNOTATION);
-        // supportedPrimitives.add(PointcutPrimitive.AT_WITHIN);
-        // supportedPrimitives.add(PointcutPrimitive.AT_ARGS);
-        // supportedPrimitives.add(PointcutPrimitive.AT_TARGET);
         this.parser = PointcutParser
                 .getPointcutParserSupportingSpecifiedPrimitivesAndUsingContextClassloaderForResolution(
                         supportedPrimitives);
     }
 
-    @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         return bean;
     }
 
-    @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         if (this.processedBeans.contains(beanName)) {
-            // We already have the metadata for this bean
             return bean;
         }
         synchronized (this.processedBeans) {
-            // check again synchronized this time
             if (this.processedBeans.contains(beanName)) {
                 return bean;
             }
-            // Obtain methods for the present bean
             Method[] methods;
             try {
                 methods = getBeanMethods(bean);
@@ -98,11 +86,9 @@ public class ProtectPointcutPostProcessor implements BeanPostProcessor {
     }
 
     private boolean attemptMatch(Class<?> targetClass, Method method, PointcutExpression expression, String beanName) {
-        // Determine if the presented AspectJ pointcut expression matches this method
-        boolean matches = expression.matchesMethodExecution(method).alwaysMatches();
-        // Handle accordingly
+        boolean matches;
         try {
-
+            matches = expression.matchesMethodExecution(method).alwaysMatches();
             if (matches) {
                 List<ConfigAttribute> attr = this.pointcutMap.get(expression.getPointcutExpression());
                 if (log.isDebugEnabled()) {
