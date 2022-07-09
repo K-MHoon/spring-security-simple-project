@@ -41,7 +41,8 @@ public class UserManagerController {
         return "admin/user/detail";
     }
 
-    @DeleteMapping("/delete/{id}")
+    @GetMapping("/delete/{id}")
+//    @DeleteMapping("/delete/{id}")
     public String removeUser(@PathVariable Long id, Model model) {
         userService.deleteUser(id);
 

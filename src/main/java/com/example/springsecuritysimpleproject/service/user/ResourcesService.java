@@ -14,7 +14,7 @@ public interface ResourcesService {
 
     void createResources(ResourcesDto resourcesDto) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException;
 
-    void deleteResources(Long id);
+    void deleteResources(Long id) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException;
 
     ResourcesDto getResourcesDtoById(Long id);
 

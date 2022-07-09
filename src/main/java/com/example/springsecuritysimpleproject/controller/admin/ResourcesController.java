@@ -18,7 +18,6 @@ public class ResourcesController {
 
     private final ResourcesService resourcesService;
     private final RoleService roleService;
-    private final UrlFilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource;
 
     @GetMapping
     public String getResources(Model model) {
@@ -30,7 +29,6 @@ public class ResourcesController {
     @PostMapping
     public String createResources(ResourcesDto resourcesDto) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         resourcesService.createResources(resourcesDto);
-        filterInvocationSecurityMetadataSource.reload();
         return "redirect:/admin/resources";
     }
 
@@ -50,10 +48,10 @@ public class ResourcesController {
         return "admin/resource/detail";
     }
 
-    @DeleteMapping("/delete/{id}")
-    public String removeResources(@PathVariable Long id, Model model) {
+//    @DeleteMapping("/delete/{id}")
+    @GetMapping("/delete/{id}")
+    public String removeResources(@PathVariable Long id, Model model) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         resourcesService.deleteResources(id);
-        filterInvocationSecurityMetadataSource.reload();
         return "redirect:/admin/resources";
     }
 }

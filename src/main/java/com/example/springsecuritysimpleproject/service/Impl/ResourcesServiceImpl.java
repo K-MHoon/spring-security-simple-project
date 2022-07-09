@@ -75,7 +75,15 @@ public class ResourcesServiceImpl implements ResourcesService {
     }
 
     @Override
-    public void deleteResources(Long id) {
+    public void deleteResources(Long id) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        Resources resources = getResources(id);
+
+        if("url".equals(resources.getResourceType())) {
+            filterInvocationSecurityMetadataSource.reload();
+        } else if("method".equals(resources.getResourceType())) {
+            methodSecurityService.removeMethodSecured(resources.getResourceName());
+        }
+
         resourcesRepository.deleteById(id);
     }
 }

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.support.DefaultSingletonBeanRegistry;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebApplicationContext;
+import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.access.method.MapBasedMethodSecurityMetadataSource;
@@ -19,7 +20,7 @@ import java.util.*;
 public class MethodSecurityService {
 
     private final MapBasedMethodSecurityMetadataSource mapBasedMethodSecurityMetadataSource;
-    private final AnnotationConfigServletWebApplicationContext applicationContext;
+    private final AnnotationConfigServletWebServerApplicationContext applicationContext;
     private final CustomMethodSecurityInterceptor methodSecurityInterceptor;
 
     private Map<String, Object> proxyMap = new HashMap<>();

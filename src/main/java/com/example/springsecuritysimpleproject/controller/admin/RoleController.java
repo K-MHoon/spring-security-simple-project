@@ -42,7 +42,8 @@ public class RoleController {
         return "admin/role/detail";
     }
 
-    @DeleteMapping("/delete/{id}")
+//    @DeleteMapping("/delete/{id}")
+    @GetMapping("/delete/{id}")
     public String removeRole(@PathVariable Long id, Model model) {
         roleService.deleteRole(id);
 
