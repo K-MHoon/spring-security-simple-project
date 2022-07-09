@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.InvocationTargetException;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/admin/resources")
@@ -26,7 +28,7 @@ public class ResourcesController {
     }
 
     @PostMapping
-    public String createResources(ResourcesDto resourcesDto) {
+    public String createResources(ResourcesDto resourcesDto) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         resourcesService.createResources(resourcesDto);
         filterInvocationSecurityMetadataSource.reload();
         return "redirect:/admin/resources";

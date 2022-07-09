@@ -3,6 +3,7 @@ package com.example.springsecuritysimpleproject.service.user;
 import com.example.springsecuritysimpleproject.domain.resources.Resources;
 import com.example.springsecuritysimpleproject.dto.resources.ResourcesDto;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public interface ResourcesService {
@@ -11,7 +12,7 @@ public interface ResourcesService {
 
     List<Resources> getResources();
 
-    void createResources(ResourcesDto resourcesDto);
+    void createResources(ResourcesDto resourcesDto) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException;
 
     void deleteResources(Long id);
 

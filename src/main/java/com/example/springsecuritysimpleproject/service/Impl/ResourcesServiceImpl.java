@@ -5,6 +5,8 @@ import com.example.springsecuritysimpleproject.domain.role.Role;
 import com.example.springsecuritysimpleproject.dto.resources.ResourcesDto;
 import com.example.springsecuritysimpleproject.repository.resources.ResourcesRepository;
 import com.example.springsecuritysimpleproject.repository.role.RoleRepository;
+import com.example.springsecuritysimpleproject.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
+import com.example.springsecuritysimpleproject.service.MethodSecurityService;
 import com.example.springsecuritysimpleproject.service.user.ResourcesService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +30,8 @@ public class ResourcesServiceImpl implements ResourcesService {
     private final ResourcesRepository resourcesRepository;
     private final ModelMapper modelMapper;
     private final RoleRepository roleRepository;
+    private final UrlFilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource;
+    private final MethodSecurityService methodSecurityService;
 
     @Override
     public Resources getResources(Long id) {
@@ -39,7 +44,7 @@ public class ResourcesServiceImpl implements ResourcesService {
     }
 
     @Override
-    public void createResources(ResourcesDto resourcesDto) {
+    public void createResources(ResourcesDto resourcesDto) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Role role = roleRepository.findByRoleName(resourcesDto.getRoleName())
                 .orElseThrow(() -> new EntityNotFoundException("Role Entity가 존재하지 않습니다."));
 
@@ -47,6 +52,12 @@ public class ResourcesServiceImpl implements ResourcesService {
         roles.add(role);
         Resources resources = modelMapper.map(resourcesDto, Resources.class);
         resources.setRoleSet(roles);
+
+        if("url".equals(resourcesDto.getResourceType())) {
+            filterInvocationSecurityMetadataSource.reload();
+        } else if("method".equals(resourcesDto.getResourceType())) {
+            methodSecurityService.addMethodSecured(resourcesDto.getResourceName(), resourcesDto.getRoleName());
+        }
 
         resourcesRepository.save(resources);
     }
